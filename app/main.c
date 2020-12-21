@@ -26,12 +26,6 @@ volatile int O = 0;
 
 sem_t *s1;
 sem_t *s2;
-
-// semaforos nomeados sao necessario para o mac
-static const char *semname1 = "Semaphore_H";
-static const char *semname2 = "Semaphore_S";
-static const char *semname3 = "Semaphore_O";
-
 int main(int argc, char *argv[])
 {
     // ;)
@@ -95,23 +89,9 @@ void cria_molecula()
     pthread_t thread1;
     pthread_t thread2;
     pthread_t thread3;
-    srand(time(NULL));
 
-    // semaforos nomeados sao necessario para o mac
-    s1 = sem_open(semname1, O_CREAT, 0777, 0);
-    if (s1 == SEM_FAILED)
-    {
-        fprintf(stderr, "%s\n", "ERROR creating semaphore Semaphore_H");
-        exit(EXIT_FAILURE);
-    }
-
-    // semaforos nomeados sao necessario para o mac
-    s2 = sem_open(semname2, O_CREAT, 0777, 0);
-    if (s2 == SEM_FAILED)
-    {
-        fprintf(stderr, "%s\n", "ERROR creating semaphore Semaphore_S");
-        exit(EXIT_FAILURE);
-    }
+    sem_init(s1, 0, 1);
+    sem_init(s2, 0, 1);
 
     while (O < 4) // Significa que a molecula ainda nao esta pronta
     {
@@ -123,9 +103,8 @@ void cria_molecula()
         pthread_join(thread2, &status);
         pthread_join(thread3, &status);
     }
-
-    sem_unlink(semname1);
-    sem_unlink(semname2);
+    sem_destroy(s1);
+    sem_destroy(s2);
 }
 
 void *thr_Hidrogenio()

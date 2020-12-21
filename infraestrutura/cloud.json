@@ -336,15 +336,21 @@
             "files": {
               "/scripts/get_git.sh": {
                 "source": "https://raw.githubusercontent.com/marcoscaco/tt304_unicamp/master/infraestrutura/get_git.sh",
-                "mode": "000777",
-                "owner": "root",
-                "group": "root"
+                "mode": "000600",
+                "owner": "apache",
+                "group": "apache"
               },
               "/scripts/compile.sh": {
                 "source": "https://raw.githubusercontent.com/marcoscaco/tt304_unicamp/master/infraestrutura/compile.sh",
-                "mode": "000777",
-                "owner": "root",
-                "group": "root"
+                "mode": "000600",
+                "owner": "apache",
+                "group": "apache"
+              },
+              "/scripts/run.sh": {
+                "source": "https://raw.githubusercontent.com/marcoscaco/tt304_unicamp/master/infraestrutura/run.sh",
+                "mode": "000600",
+                "owner": "apache",
+                "group": "apache"
               }
             }
           }
@@ -398,9 +404,7 @@
                 {
                   "Ref": "AWS::Region"
                 },
-                "\n",
-                "bash /scripts/get_git.sh\n",
-                "bash /scripts/compile.sh\n"
+                "\n"
               ]
             ]
           }

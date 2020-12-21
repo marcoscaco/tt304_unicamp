@@ -24,8 +24,8 @@ volatile int H = 0;
 volatile int S = 0;
 volatile int O = 0;
 
-sem_t *s1;
-sem_t *s2;
+sem_t s1;
+sem_t s2;
 int main(int argc, char *argv[])
 {
     // ;)
@@ -90,8 +90,8 @@ void cria_molecula()
     pthread_t thread2;
     pthread_t thread3;
 
-    sem_init(s1, 0, 1);
-    sem_init(s2, 0, 1);
+    sem_init(&s1, 0, 1);
+    sem_init(&s2, 0, 1);
 
     while (O < 4) // Significa que a molecula ainda nao esta pronta
     {
@@ -103,8 +103,8 @@ void cria_molecula()
         pthread_join(thread2, &status);
         pthread_join(thread3, &status);
     }
-    sem_destroy(s1);
-    sem_destroy(s2);
+    sem_destroy(&s1);
+    sem_destroy(&s2);
 }
 
 void *thr_Hidrogenio()
@@ -116,7 +116,7 @@ void *thr_Hidrogenio()
             printf("H");
             H++;
         }
-        sem_post(s1);
+         sem_post(&s1);
         // Esse break independe de condiçao e garante
         // que a thread vai gerara no maximo 1 atomo
         break;
@@ -127,13 +127,13 @@ void *thr_Enxofre()
 {
     for (;;)
     {
-        sem_wait(s1);
+        sem_wait(&s1);
         if (S < 1 && H >= 2)
         {
             printf("S");
             S++;
         }
-        sem_post(s2);
+        sem_post(&s2);
         // Esse break independe de condiçao e garante
         // que a thread vai gerara no maximo 1 atomo
         break;
@@ -144,8 +144,8 @@ void *thr_Oxigenio()
 {
     for (;;)
     {
-        sem_wait(s2);
-        if (O < 4 && H >= 2)
+        sem_wait(&s2);
+        if (O < 4 && S == 1 && H >= 2)
         {
             printf("O");
             O++;

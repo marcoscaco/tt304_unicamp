@@ -1,3 +1,4 @@
 #!/bin/bash -xe
-cd /trabalho_git
+cd /trabalhoProg/app
 gcc main.c -w -l phthreds -o main
+chmod 777 main

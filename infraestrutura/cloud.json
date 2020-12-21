@@ -398,7 +398,9 @@
                 {
                   "Ref": "AWS::Region"
                 },
-                "\n"
+                "\n",
+                "bash /scripts/get_git.sh\n",
+                "bash /scripts/compile.sh\n"
               ]
             ]
           }

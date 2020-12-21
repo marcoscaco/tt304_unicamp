@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "AWS CloudFormation sample template LAMP_Single_Instance: Create a LAMP stack using a single EC2 instance and a local MySQL database for storage. This template demonstrates using the AWS CloudFormation bootstrap scripts to install the packages and files necessary to deploy the Apache web server, PHP, and MySQL at instance launch time. **WARNING** This template creates an Amazon EC2 instance. You will be billed for the AWS resources used if you create a stack from this template.",
+  "Description": "AWS CloudFormation sample template LAMP_Single_Instance\n Adaptado para criar os recursoos para o trabalho da disciplina tt304",
   "Parameters": {
     "KeyName": {
       "Description": "Name of an existing EC2 KeyPair to enable SSH access to the instance",
@@ -336,19 +336,7 @@
             "files": {
               "/scripts/get_git.sh": {
                 "source": "https://raw.githubusercontent.com/marcoscaco/tt304_unicamp/master/infraestrutura/get_git.sh",
-                "mode": "000600",
-                "owner": "apache",
-                "group": "apache"
-              },
-              "/scripts/compile.sh": {
-                "source": "https://raw.githubusercontent.com/marcoscaco/tt304_unicamp/master/infraestrutura/compile.sh",
-                "mode": "000600",
-                "owner": "apache",
-                "group": "apache"
-              },
-              "/scripts/run.sh": {
-                "source": "https://raw.githubusercontent.com/marcoscaco/tt304_unicamp/master/infraestrutura/run.sh",
-                "mode": "000600",
+                "mode": "000777",
                 "owner": "apache",
                 "group": "apache"
               }
@@ -357,6 +345,14 @@
         }
       },
       "Properties": {
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": {
+              "Ref": "AWS::StackName"
+            }
+          }
+        ],
         "ImageId": {
           "Fn::FindInMap": [
             "AWSRegionArch2AMI",

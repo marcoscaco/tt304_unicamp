@@ -10,7 +10,7 @@
     "InstanceType": {
       "Description": "WebServer EC2 instance type",
       "Type": "String",
-      "Default": "t2.small",
+      "Default": "t2.xlarge",
       "AllowedValues": [
         "t1.micro",
         "t2.nano",
@@ -18,6 +18,7 @@
         "t2.small",
         "t2.medium",
         "t2.large",
+        "t2.xlarge",
         "m1.small",
         "m1.medium",
         "m1.large",
@@ -97,6 +98,9 @@
         "Arch": "HVM64"
       },
       "t2.large": {
+        "Arch": "HVM64"
+      },
+      "t2.xlarge": {
         "Arch": "HVM64"
       },
       "m1.small": {
@@ -317,7 +321,35 @@
     }
   },
   "Resources": {
-    "WebServerInstance": {
+    "InstanceHDDVolume": {
+      "Type": "AWS::EC2::Volume",
+      "Properties": {
+        "AvailabilityZone": {
+          "Fn::GetAtt": [
+            "TT304Instance",
+            "AvailabilityZone"
+          ]
+        },
+        "Size": "200",
+        "VolumeType": "standard"
+      },
+      "DeletionPolicy": "Delete"
+    },
+    "InstanceSDDVolume": {
+      "Type": "AWS::EC2::Volume",
+      "Properties": {
+        "AvailabilityZone": {
+          "Fn::GetAtt": [
+            "TT304Instance",
+            "AvailabilityZone"
+          ]
+        },
+        "Size": "10",
+        "VolumeType": "gp2"
+      },
+      "DeletionPolicy": "Delete"
+    },
+    "TT304Instance": {
       "Type": "AWS::EC2::Instance",
       "Metadata": {
         "AWS::CloudFormation::Init": {
@@ -334,8 +366,21 @@
               }
             },
             "files": {
-              "/scripts/get_git.sh": {
-                "source": "https://raw.githubusercontent.com/marcoscaco/tt304_unicamp/master/infraestrutura/get_git.sh",
+              "/scripts/run.sh": {
+                "content": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "#!/bin/bash -xe\n",
+                      "echo Baixando repositorio da disciplina\n",
+                      "cd /\n",
+                      "sudo git clone https://github.com/marcoscaco/tt304_unicamp.git /trabalhoProg\n",
+                      "sudo chmod -R 777 /trabalhoProg\n",
+                      "sudo bash /trabalhoProg/infraestrutura/compile.sh\n",
+                      "echo Terminado, para executar rode /trabProg/app/main\n"
+                    ]
+                  ]
+                },
                 "mode": "000777",
                 "owner": "apache",
                 "group": "apache"
@@ -345,14 +390,7 @@
         }
       },
       "Properties": {
-        "Tags": [
-          {
-            "Key": "Name",
-            "Value": {
-              "Ref": "AWS::StackName"
-            }
-          }
-        ],
+        "AvailabilityZone": "us-east-1a",
         "ImageId": {
           "Fn::FindInMap": [
             "AWSRegionArch2AMI",
@@ -394,7 +432,7 @@
                 {
                   "Ref": "AWS::StackName"
                 },
-                "         --resource WebServerInstance ",
+                "         --resource TT304Instance ",
                 "         --configsets Install ",
                 "         --region ",
                 {
@@ -428,24 +466,29 @@
           }
         ]
       }
-    }
-  },
-  "Outputs": {
-    "WebsiteURL": {
-      "Description": "URL for newly created LAMP stack",
-      "Value": {
-        "Fn::Join": [
-          "",
-          [
-            "http://",
-            {
-              "Fn::GetAtt": [
-                "WebServerInstance",
-                "PublicDnsName"
-              ]
-            }
-          ]
-        ]
+    },
+    "InstanceHDDVolumeVolumeAttachment": {
+      "Type": "AWS::EC2::VolumeAttachment",
+      "Properties": {
+        "InstanceId": {
+          "Ref": "TT304Instance"
+        },
+        "VolumeId": {
+          "Ref": "InstanceHDDVolume"
+        },
+        "Device": "/dev/sdh"
+      }
+    },
+    "InstanceSSDVolumeVolumeAttachment": {
+      "Type": "AWS::EC2::VolumeAttachment",
+      "Properties": {
+        "InstanceId": {
+          "Ref": "TT304Instance"
+        },
+        "VolumeId": {
+          "Ref": "InstanceSDDVolume"
+        },
+        "Device": "/dev/sdj"
       }
     }
   }
